@@ -1,0 +1,11 @@
+# Working artifacts (not part of the published site)
+_research/
+_shots/
+.dev-*.jsonl
+
+# Tooling
+node_modules/
+dist/
+.DS_Store
+*.log
+.env
