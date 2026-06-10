@@ -176,7 +176,7 @@ em.grad-text, .grad-text em { font-style: normal; }
 .mobile-nav .btn { margin-top: 24px; }
 
 /* Hero — blueprint */
-.hero { position: relative; padding-top: clamp(36px, 6vw, 72px); padding-bottom: var(--section-y); overflow: hidden; background: var(--grid-dot); background-size: 26px 26px; }
+.hero { position: relative; padding-top: clamp(36px, 6vw, 72px); padding-bottom: var(--section-y); overflow: hidden; background: linear-gradient(165deg, #f1f9f5 0%, #eef6fb 50%, #f5f8fc 100%); }
 .hero::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--grad-horizon); opacity: 0.9; }
 .aurora { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
 .aurora span { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.18; }
@@ -326,7 +326,7 @@ em.grad-text, .grad-text em { font-style: normal; }
 .ack { font-size: 0.83rem; color: rgba(255,255,255,0.5); max-width: 720px; padding-bottom: 24px; line-height: 1.6; }
 
 /* Page hero (sub) */
-.page-hero { position: relative; padding-top: clamp(44px, 5vw, 76px); padding-bottom: clamp(38px, 5vw, 56px); overflow: hidden; background: var(--grid-dot); background-size: 26px 26px; }
+.page-hero { position: relative; padding-top: clamp(44px, 5vw, 76px); padding-bottom: clamp(38px, 5vw, 56px); overflow: hidden; background: linear-gradient(165deg, #f1f9f5 0%, #eef6fb 50%, #f5f8fc 100%); }
 .page-hero::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--grad-horizon); }
 .page-hero .wrap { position: relative; z-index: 1; }
 .breadcrumb { display: flex; gap: 8px; align-items: center; font-size: 0.82rem; color: var(--muted); margin-bottom: 20px; font-family: var(--font-mono); }
