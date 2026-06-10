@@ -133,7 +133,7 @@
 
         <div class="hero-visual reveal" data-d="2">
           <div class="medallion">
-            <img src="assets/img/logo.png" alt="Beaches Brain Clinic logo" width="220" height="220" />
+            <img src="assets/img/hero-child.jpg" alt="A child completing a cognitive assessment task with the clinician" width="340" height="340" />
           </div>
           <div class="glass-chip"><b>6+</b> ages assessed</div>
           <div class="glass-card">
@@ -326,14 +326,8 @@
             </div>
           </div>
 
-          <!-- Contact form -->
-          <form class="form-card ajax-form reveal" data-d="1" action="https://api.web3forms.com/submit" method="POST">
-            <!-- Get a free key at https://web3forms.com (uses contact@beachesbrainclinic.com.au) -->
-            <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
-            <input type="hidden" name="subject" value="New enquiry from Beaches Brain Clinic website" />
-            <input type="hidden" name="from_name" value="Beaches Brain Clinic Website" />
-            <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
-
+          <!-- Contact form — POSTs JSON to the Sydney inquiry handler (see assets/js/main.js) -->
+          <form class="form-card inquiry-form reveal" data-d="1" novalidate>
             <div class="field-row">
               <div class="field">
                 <label for="name">Name <span class="req">*</span></label>
@@ -349,21 +343,40 @@
               <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com" />
             </div>
             <div class="field">
-              <label for="reason">I'm enquiring about</label>
-              <select id="reason" name="enquiry_type">
-                <option>Child &amp; adolescent assessment</option>
-                <option>Adult assessment</option>
-                <option>Cognitive rehabilitation</option>
-                <option>A referral (health professional)</option>
-                <option>Something else</option>
+              <label for="referral_source">How were you referred to us? <span class="req">*</span></label>
+              <select id="referral_source" name="referral_source" required>
+                <option value="" disabled selected>Please choose…</option>
+                <option value="gp">GP</option>
+                <option value="school">School</option>
+                <option value="ndis_coordinator">NDIS coordinator</option>
+                <option value="neurologist">Neurologist</option>
+                <option value="allied_health">Allied health professional</option>
+                <option value="eyecare">Eye-care / optometrist</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div class="field">
-              <label for="message">Message <span class="req">*</span></label>
-              <textarea id="message" name="message" required placeholder="Tell us a little about what you're looking for…"></textarea>
+              <label for="referral_detail">Who referred you? <span class="muted" style="font-weight:400">(optional)</span></label>
+              <input id="referral_detail" name="referral_detail" type="text" placeholder="e.g. your GP's name and clinic" />
             </div>
+            <div class="field">
+              <label for="reason">How can we help? <span class="req">*</span></label>
+              <textarea id="reason" name="reason" required placeholder="A few words about what you're looking for…"></textarea>
+            </div>
+
+            <!-- Honeypot: hidden from people, tempting to bots -->
+            <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+            <!-- APP 5 collection notice — placeholder copy, MUST be lawyer-reviewed before launch -->
+            <p class="form-note" style="margin-bottom:14px">
+              The information you provide is collected by Beaches Brain Clinic to respond to your
+              enquiry and is stored securely in Australia. We handle it in line with the Australian
+              Privacy Principles and our <a href="privacy.html">Privacy Policy</a>. Please don't
+              include sensitive clinical detail beyond what's needed to direct your enquiry.
+            </p>
+
             <div class="form-foot">
-              <button type="submit" class="btn btn-primary btn-lg">Send message
+              <button type="submit" class="btn btn-primary btn-lg">Send enquiry
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
               </button>
               <span class="form-note">We typically reply within one business day.</span>
@@ -393,6 +406,7 @@
           <a href="about.html">About Dr Phillips</a>
           <a href="referrals.html">Referrals</a>
           <a href="index.html#contact">Contact</a>
+          <a href="privacy.html">Privacy Policy</a>
         </div>
         <div class="footer-col">
           <h4>Assessments</h4>

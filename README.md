@@ -45,26 +45,26 @@ them before going live if you want a clean folder.
 
 ---
 
-## 3. Connect the contact & referral forms (≈2 minutes, free)
+## 3. Connect the contact & referral forms
 
-The two forms (Contact on the home page, and the Referral form) submit through
-**[Web3Forms](https://web3forms.com)** — a free service that emails each submission to you.
-No server or backend required.
+Both forms (Contact on the home page, and the Referral form) POST JSON to the **Sydney
+inquiry handler** (Cloud Run, `australia-southeast1` — see the private
+`beaches-brain-clinic-backend` repo). No third-party form service: health-related
+content stays on Australian infrastructure (APP 8).
 
-1. Go to **https://web3forms.com**, enter **contact@beachesbrainclinic.com.au**, and you'll
-   be emailed a free **Access Key** (a long string like `a1b2c3d4-...`).
-2. In **`index.html`** and **`referrals.html`**, find this line (once in each file):
+1. Deploy the backend and copy its Cloud Run URL.
+2. In `assets/js/main.js`, set the constant near the top:
 
-   ```html
-   <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
+   ```js
+   var INQUIRY_ENDPOINT = "https://<cloud-run-url>/inquiry";
    ```
 
-   Replace `YOUR_WEB3FORMS_ACCESS_KEY` with your real key.
-3. Done. Submissions now arrive in the clinic inbox. The forms already include spam
-   protection (honeypot) and show a success/error message in-page.
+3. Add this site's origin to the backend's `ALLOWED_ORIGINS` env var so CORS passes.
 
-> Free tier = 250 submissions/month, which is plenty. Until a real key is added, the form
-> shows a friendly "not connected yet" message instead of failing silently.
+Until the endpoint is set, both forms show a friendly "not connected yet" message and
+point people at the clinic email instead of failing silently. The referral form's fields
+are mapped into the same `/inquiry` payload in `main.js` (client details fold into the
+free-text `reason`, which the backend seals and de-identifies).
 
 ---
 
@@ -85,7 +85,14 @@ Common edits:
 
 ---
 
-## 5. Hosting — the cheapest options
+## 5. Hosting
+
+**Current state:** the site auto-deploys to **GitHub Pages** from `main` (test/staging URL —
+see the repo's Settings → Pages). This is the "stand it up and test end-to-end" step of the
+cutover; the custom domain goes to Cloudflare Pages (below) at go-live, and only then does
+the old droplet get decommissioned.
+
+### The cheapest options
 
 This is a static site, so it can run on free hosting that's faster and far more reliable
 than the current Digital Ocean + WordPress setup (and removes the security/update burden).

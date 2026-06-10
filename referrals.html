@@ -105,11 +105,9 @@
     <!-- REFERRAL FORM -->
     <section class="section">
       <div class="wrap" style="max-width:820px">
-        <form class="form-card ajax-form reveal" action="https://api.web3forms.com/submit" method="POST">
-          <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY" />
-          <input type="hidden" name="subject" value="New referral from Beaches Brain Clinic website" />
-          <input type="hidden" name="from_name" value="Beaches Brain Clinic Referrals" />
-          <input type="checkbox" name="botcheck" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <!-- Referral form — mapped to the Sydney inquiry handler in assets/js/main.js -->
+        <form class="form-card referral-form reveal" novalidate>
+          <input type="text" name="company" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true" />
 
           <span class="eyebrow">Referring practitioner</span>
           <h3 class="h3" style="margin:10px 0 22px">Your details</h3>
@@ -157,6 +155,13 @@
           <div class="field"><label for="cl-meds">Current medications <span class="muted" style="font-weight:400">(optional)</span></label><input id="cl-meds" name="medications" type="text" /></div>
           <div class="field"><label for="cl-history">Relevant medical history <span class="muted" style="font-weight:400">(optional)</span></label><textarea id="cl-history" name="medical_history"></textarea></div>
 
+          <!-- APP 5 collection notice — placeholder copy, MUST be lawyer-reviewed before launch -->
+          <p class="form-note" style="margin-bottom:14px">
+            The information you provide is collected by Beaches Brain Clinic to assess and respond
+            to this referral and is stored securely in Australia. We handle it in line with the
+            Australian Privacy Principles and our <a href="privacy.html">Privacy Policy</a>.
+          </p>
+
           <div class="form-foot">
             <button type="submit" class="btn btn-primary btn-lg">Submit referral
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
@@ -183,7 +188,7 @@
           <p>Comprehensive, evidence-based cognitive assessment and rehabilitation for children, adolescents and adults — on Sydney's Northern Beaches.</p>
         </div>
         <div class="footer-col"><h4>Explore</h4>
-          <a href="index.html">Home</a><a href="about.html">About Dr Phillips</a><a href="referrals.html">Referrals</a><a href="index.html#contact">Contact</a>
+          <a href="index.html">Home</a><a href="about.html">About Dr Phillips</a><a href="referrals.html">Referrals</a><a href="index.html#contact">Contact</a><a href="privacy.html">Privacy Policy</a>
         </div>
         <div class="footer-col"><h4>Assessments</h4>
           <a href="child-assessment.html">Child &amp; Adolescent</a><a href="adult-assessment.html">Adult Assessment</a><a href="index.html#services">Cognitive Rehabilitation</a>
