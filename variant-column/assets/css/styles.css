@@ -262,9 +262,7 @@ em.grad-text, .grad-text em { font-style: normal; }
 /* Steps */
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2.4vw, 28px); }
 .step { position: relative; padding-top: 16px; }
-.step .step-num { width: 46px; height: 46px; border-radius: var(--r-md); display: grid; place-items: center; font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: #fff; background: var(--navy); margin-bottom: 16px; }
-.step:nth-child(2) .step-num { background: var(--action); }
-.step:nth-child(3) .step-num { background: var(--blue); }
+.step .step-num { width: 46px; height: 46px; border-radius: var(--r-md); display: grid; place-items: center; font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: #fff; background: var(--action); margin-bottom: 16px; }
 .step h3 { font-size: 1.15rem; margin-bottom: 7px; }
 .step p { color: var(--muted); font-size: 0.94rem; }
 .step:not(:last-child)::after { content: ""; position: absolute; top: 39px; left: 60px; right: -14px; height: 2px; background: repeating-linear-gradient(90deg, var(--line-strong) 0 6px, transparent 6px 12px); }
