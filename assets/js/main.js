@@ -2,6 +2,10 @@
 (function () {
   "use strict";
 
+  /* Sydney inquiry handler (Cloud Run, australia-southeast1). Leave "" until the
+     backend is deployed — the forms show a friendly "not connected" message. */
+  var INQUIRY_ENDPOINT = "";
+
   /* ---- Sticky header background on scroll ---- */
   var header = document.querySelector(".site-header");
   function onScroll() {
@@ -57,34 +61,79 @@
     if (path === here) a.classList.add("active");
   });
 
-  /* ---- Web3Forms AJAX submit (forms with class .ajax-form) ---- */
-  document.querySelectorAll("form.ajax-form").forEach(function (form) {
+  /* ---- Inquiry submit: POST JSON to the Sydney handler ---- */
+
+  /* The referral form's fields don't map 1:1 onto the /inquiry payload, so
+     compose one: referrer = the contact, client details fold into `reason`
+     (sealed + de-identified server-side, never emailed). */
+  var PROFESSION_TO_SOURCE = {
+    "Neurologist": "neurologist",
+    "General Practitioner": "gp",
+    "Psychiatrist": "allied_health",
+    "Paediatrician": "allied_health",
+    "Psychologist": "allied_health",
+    "Physiotherapist": "allied_health",
+    "Occupational Therapist": "allied_health",
+    "Speech Pathologist": "allied_health"
+  };
+
+  function referralPayload(data) {
+    var reason = [
+      "Referral from a health professional (" + (data.profession || "unspecified") + (data.organisation ? ", " + data.organisation : "") + ").",
+      "Client: " + [data.client_first_name, data.client_last_name].join(" ").trim() +
+        (data.client_dob ? ", DOB " + data.client_dob : "") +
+        (data.client_sex ? ", " + data.client_sex : "") + ".",
+      "Client contact: " + [data.client_phone, data.client_email].filter(Boolean).join(" / ") + ".",
+      "Reason for referral: " + (data.reason_for_referral || ""),
+      "Presenting issues: " + (data.presenting_issues || ""),
+      data.diagnoses ? "Diagnoses: " + data.diagnoses : "",
+      data.medications ? "Medications: " + data.medications : "",
+      data.medical_history ? "Medical history: " + data.medical_history : ""
+    ].filter(Boolean).join("\n");
+    return {
+      name: [data.referrer_first_name, data.referrer_last_name].join(" ").trim(),
+      email: data.referrer_email,
+      phone: data.referrer_phone || "",
+      reason: reason,
+      referral_source: PROFESSION_TO_SOURCE[data.profession] || "allied_health",
+      referral_detail: [data.profession, data.organisation].filter(Boolean).join(", "),
+      company: data.company || ""
+    };
+  }
+
+  document.querySelectorAll("form.inquiry-form, form.referral-form").forEach(function (form) {
     var status = form.querySelector(".form-status");
     var submitBtn = form.querySelector('[type="submit"]');
     var defaultLabel = submitBtn ? submitBtn.innerHTML : "";
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var key = form.querySelector('input[name="access_key"]');
-      if (key && /YOUR_WEB3FORMS/.test(key.value)) {
-        showStatus("err", "Form not connected yet — add your free Web3Forms access key (see README) to start receiving submissions.");
+      if (!form.reportValidity()) return;
+      if (!INQUIRY_ENDPOINT) {
+        showStatus("err", "This form isn't connected yet. Please email us directly at contact@beachesbrainclinic.com.au.");
         return;
       }
+
+      var data = Object.fromEntries(new FormData(form).entries());
+      var payload = form.classList.contains("referral-form") ? referralPayload(data) : data;
+
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "Sending…"; }
       if (status) status.className = "form-status";
 
-      fetch("https://api.web3forms.com/submit", {
+      fetch(INQUIRY_ENDPOINT, {
         method: "POST",
-        headers: { Accept: "application/json" },
-        body: new FormData(form)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
       })
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          if (data.success) {
+        .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
+        .then(function (res) {
+          if (res.ok) {
             form.reset();
-            showStatus("ok", "Thank you — your message has been sent. We'll be in touch shortly.");
+            showStatus("ok", "Thank you — your enquiry has been received. We'll be in touch shortly.");
+          } else if (res.body && res.body.error === "validation_failed") {
+            showStatus("err", "Please check the highlighted fields and try again.");
           } else {
-            showStatus("err", (data && data.message) || "Something went wrong. Please email us directly at contact@beachesbrainclinic.com.au.");
+            showStatus("err", "Something went wrong. Please email us directly at contact@beachesbrainclinic.com.au.");
           }
         })
         .catch(function () {
@@ -107,34 +156,4 @@
   var y = document.querySelector(".js-year");
   if (y) y.textContent = new Date().getFullYear();
 
-  /* ---- Design-variant switcher: shows on the preview ports 8137/8138/8139 whether
-     reached via localhost OR a LAN IP (e.g. 192.168.x.x); hidden on the live site ---- */
-  var host = location.hostname;
-  if (["8137", "8138", "8139"].indexOf(location.port) !== -1) {
-    var variants = [
-      { port: "8137", label: "A", name: "Aurora" },
-      { port: "8138", label: "B", name: "Column" },
-      { port: "8139", label: "C", name: "Supahub" }
-    ];
-    var bar = document.createElement("div");
-    bar.setAttribute("aria-label", "Design variant switcher");
-    bar.style.cssText = "position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:9999;display:flex;gap:4px;align-items:center;padding:6px 6px 6px 0;border-radius:999px;background:rgba(15,23,42,0.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 14px 34px -8px rgba(0,0,0,0.5);font-family:ui-sans-serif,system-ui,-apple-system,'Inter',sans-serif;";
-    var tag = document.createElement("span");
-    tag.textContent = "DESIGN";
-    tag.style.cssText = "color:rgba(255,255,255,0.5);font-size:10px;font-weight:700;letter-spacing:0.14em;padding:0 10px;";
-    bar.appendChild(tag);
-    variants.forEach(function (v) {
-      var active = v.port === location.port;
-      var a = document.createElement("a");
-      a.href = location.protocol + "//" + host + ":" + v.port + location.pathname;
-      a.textContent = v.label;
-      a.title = v.name + " — port " + v.port;
-      a.style.cssText = "display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 6px;border-radius:999px;font-size:13px;font-weight:700;line-height:1;text-decoration:none;transition:background .2s,color .2s;" +
-        (active ? "background:#fff;color:#0f172a;" : "background:transparent;color:rgba(255,255,255,0.72);");
-      a.addEventListener("mouseenter", function () { if (!active) a.style.background = "rgba(255,255,255,0.14)"; });
-      a.addEventListener("mouseleave", function () { if (!active) a.style.background = "transparent"; });
-      bar.appendChild(a);
-    });
-    document.body.appendChild(bar);
-  }
 })();
