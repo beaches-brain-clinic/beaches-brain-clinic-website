@@ -63,7 +63,7 @@
 
   --maxw: 1200px;
   --gutter: clamp(20px, 5vw, 56px);
-  --section-y: clamp(58px, 8vw, 112px);
+  --section-y: clamp(29px, 4vw, 56px);
 
   --grid-dot: radial-gradient(rgba(14,63,119,0.10) 1px, transparent 1px);
 }
