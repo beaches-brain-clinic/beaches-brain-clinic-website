@@ -2,9 +2,8 @@
 (function () {
   "use strict";
 
-  /* Sydney inquiry handler (Cloud Run, australia-southeast1). Leave "" until the
-     backend is deployed — the forms show a friendly "not connected" message. */
-  var INQUIRY_ENDPOINT = "";
+  /* Sydney inquiry handler (Cloud Run, australia-southeast1). */
+  var INQUIRY_ENDPOINT = "https://inquiry-handler-2kmdoytnva-ts.a.run.app/inquiry";
 
   /* ---- Sticky header background on scroll ---- */
   var header = document.querySelector(".site-header");
