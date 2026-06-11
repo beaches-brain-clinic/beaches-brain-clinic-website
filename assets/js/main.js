@@ -101,23 +101,10 @@
     };
   }
 
-  /* Pre-warm the (scale-to-zero) backend the moment someone starts the form, so
-     their submit lands on a warm instance. One ping per page load; no-cors means
-     we only care that the request arrives, not what comes back. Worst-case bot
-     abuse = a few extra cold starts, comfortably inside the free tier. */
-  var prewarmed = false;
-  function prewarm() {
-    if (prewarmed || !INQUIRY_ENDPOINT) return;
-    prewarmed = true;
-    fetch(INQUIRY_ENDPOINT.replace(/\/inquiry$/, "/health"), { mode: "no-cors" }).catch(function () {});
-  }
-
   document.querySelectorAll("form.inquiry-form, form.referral-form").forEach(function (form) {
     var status = form.querySelector(".form-status");
     var submitBtn = form.querySelector('[type="submit"]');
     var defaultLabel = submitBtn ? submitBtn.innerHTML : "";
-
-    form.addEventListener("focusin", prewarm, { once: true });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
