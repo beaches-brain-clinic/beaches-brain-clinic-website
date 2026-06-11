@@ -65,16 +65,14 @@
   /* The referral form's fields don't map 1:1 onto the /inquiry payload, so
      compose one: referrer = the contact, client details fold into `reason`
      (sealed + de-identified server-side, never emailed). */
-  var PROFESSION_TO_SOURCE = {
-    "Neurologist": "neurologist",
-    "General Practitioner": "gp",
-    "Psychiatrist": "allied_health",
-    "Paediatrician": "allied_health",
-    "Psychologist": "allied_health",
-    "Physiotherapist": "allied_health",
-    "Occupational Therapist": "allied_health",
-    "Speech Pathologist": "allied_health"
-  };
+  function ageRangeFromDob(dob) {
+    var d = new Date(dob);
+    if (!dob || isNaN(d.getTime())) return "";
+    var age = (Date.now() - d.getTime()) / 31557600000; /* ms per year */
+    if (age <= 12) return "child_0_12";
+    if (age <= 18) return "adolescent_13_18";
+    return "adult_19_plus";
+  }
 
   function referralPayload(data) {
     var reason = [
@@ -90,11 +88,14 @@
       data.medical_history ? "Medical history: " + data.medical_history : ""
     ].filter(Boolean).join("\n");
     return {
-      name: [data.referrer_first_name, data.referrer_last_name].join(" ").trim(),
+      first_name: data.referrer_first_name || "",
+      last_name: data.referrer_last_name || "",
       email: data.referrer_email,
       phone: data.referrer_phone || "",
       reason: reason,
-      referral_source: PROFESSION_TO_SOURCE[data.profession] || "allied_health",
+      /* "how did you hear about us" approximated from the referrer's profession */
+      referral_source: data.profession === "General Practitioner" ? "gp" : "other_health_professional",
+      age_range: ageRangeFromDob(data.client_dob),
       referral_detail: [data.profession, data.organisation].filter(Boolean).join(", "),
       company: data.company || ""
     };

@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260611" />
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260611b" />
 
   <!-- Structured data -->
   <script type="application/ld+json">
@@ -330,8 +330,18 @@
           <form class="form-card inquiry-form reveal" data-d="1" novalidate>
             <div class="field-row">
               <div class="field">
-                <label for="name">Name <span class="req">*</span></label>
-                <input id="name" name="name" type="text" required autocomplete="name" placeholder="Your full name" />
+                <label for="first_name">First name <span class="req">*</span></label>
+                <input id="first_name" name="first_name" type="text" required autocomplete="given-name" placeholder="First name" />
+              </div>
+              <div class="field">
+                <label for="last_name">Last name <span class="req">*</span></label>
+                <input id="last_name" name="last_name" type="text" required autocomplete="family-name" placeholder="Last name" />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="email">Email <span class="req">*</span></label>
+                <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com" />
               </div>
               <div class="field">
                 <label for="phone">Phone</label>
@@ -339,20 +349,36 @@
               </div>
             </div>
             <div class="field">
-              <label for="email">Email <span class="req">*</span></label>
-              <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com" />
+              <label for="enquiry_type">Reason for contact <span class="req">*</span></label>
+              <select id="enquiry_type" name="enquiry_type" required>
+                <option value="" disabled selected>Please choose…</option>
+                <option value="adhd_assessment">ADHD assessment</option>
+                <option value="autism_assessment">Autism assessment</option>
+                <option value="iq_learning_assessment">IQ/Learning assessment</option>
+                <option value="memory_dementia_assessment">Memory and Dementia assessment</option>
+                <option value="concussion_brain_injury_assessment">Concussion/brain injury assessment</option>
+                <option value="neuropsychological_assessment">Neuropsychological assessment</option>
+                <option value="ndis_capacity_building_assessment">NDIS Capacity building assessment</option>
+              </select>
             </div>
             <div class="field">
-              <label for="referral_source">How were you referred to us? <span class="req">*</span></label>
+              <label for="age_range">Age range <span class="req">*</span></label>
+              <select id="age_range" name="age_range" required>
+                <option value="" disabled selected>Please choose…</option>
+                <option value="child_0_12">Child (0–12)</option>
+                <option value="adolescent_13_18">Adolescent (13–18)</option>
+                <option value="adult_19_plus">Adult (19+)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="referral_source">How did you hear about us? <span class="req">*</span></label>
               <select id="referral_source" name="referral_source" required>
                 <option value="" disabled selected>Please choose…</option>
+                <option value="google_search">Google search</option>
+                <option value="friend">Friend</option>
                 <option value="gp">GP</option>
+                <option value="other_health_professional">Other health professional</option>
                 <option value="school">School</option>
-                <option value="ndis_coordinator">NDIS coordinator</option>
-                <option value="neurologist">Neurologist</option>
-                <option value="allied_health">Allied health professional</option>
-                <option value="eyecare">Eye-care / optometrist</option>
-                <option value="other">Other</option>
               </select>
             </div>
             <div class="field">
@@ -429,6 +455,6 @@
     </div>
   </footer>
 
-  <script src="assets/js/main.js?v=20260611"></script>
+  <script src="assets/js/main.js?v=20260611b"></script>
 </body>
 </html>
