@@ -116,6 +116,24 @@
     var submitBtn = form.querySelector('[type="submit"]');
     var defaultLabel = submitBtn ? submitBtn.innerHTML : "";
 
+    /* Clinical supervision is for a professional, not a client — the age range
+       doesn't apply, so hide + un-require it when that reason is chosen. The backend
+       treats age_range as optional, so submitting it empty is fine. */
+    var syncAgeVisibility = function () {};
+    var enquirySelect = form.querySelector("#enquiry_type");
+    var ageSelect = form.querySelector("#age_range");
+    if (enquirySelect && ageSelect) {
+      var ageField = ageSelect.closest(".field");
+      syncAgeVisibility = function () {
+        var hide = enquirySelect.value === "clinical_supervision";
+        if (ageField) ageField.style.display = hide ? "none" : "";
+        ageSelect.required = !hide;
+        if (hide) ageSelect.value = "";
+      };
+      enquirySelect.addEventListener("change", syncAgeVisibility);
+      syncAgeVisibility();
+    }
+
     form.addEventListener("focusin", prewarm, { once: true });
 
     form.addEventListener("submit", function (e) {
@@ -141,6 +159,7 @@
         .then(function (res) {
           if (res.ok) {
             form.reset();
+            syncAgeVisibility();
             showStatus("ok", "Thank you — your enquiry has been received. We'll be in touch shortly.");
           } else if (res.body && res.body.error === "validation_failed") {
             showStatus("err", "Please check the highlighted fields and try again.");
