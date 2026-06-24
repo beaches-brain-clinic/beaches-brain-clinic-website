@@ -234,6 +234,10 @@ em.grad-text, .grad-text em { font-style: normal; }
 .card .link-arrow { margin-top: 18px; }
 .card-num { position: absolute; top: 20px; right: 24px; font-family: var(--font-mono); font-size: 1.4rem; font-weight: 600; color: var(--line-strong); line-height: 1; }
 
+/* Card grids with mixed-length headings: reserve 2 heading lines so the body copy
+   starts at the same height. Desktop only — cards stack on mobile, so it's moot there. */
+@media (min-width: 721px) { .cards-balance .card h3 { min-height: 2lh; } }
+
 /* About */
 .about-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(32px, 5vw, 68px); align-items: center; }
 .portrait { position: relative; }
