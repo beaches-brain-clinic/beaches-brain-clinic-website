@@ -52,12 +52,18 @@
   }
 
   /* ---- Active nav link by current path ---- */
-  var here = location.pathname.replace(/index\.html$/, "").replace(/\/$/, "") || "/";
+  /* Compare the page name only ("about"), so it matches whether the URL is
+     /about, /about.html, or under the staging subfolder. "" is the home page. */
+  function pageName(path) {
+    var last = path.split("#")[0].split("?")[0].replace(/\/$/, "").split("/").pop() || "";
+    last = last.replace(/\.html$/, "");
+    return last === "index" || last === "." || last === "beaches-brain-clinic-website" ? "" : last;
+  }
+  var here = pageName(location.pathname);
   document.querySelectorAll(".nav-links a, .mobile-nav a").forEach(function (a) {
     var href = a.getAttribute("href") || "";
-    if (href.charAt(0) === "#") return;
-    var path = href.replace(/index\.html$/, "").replace(/\/$/, "") || "/";
-    if (path === here) a.classList.add("active");
+    if (href.charAt(0) === "#" || href.indexOf("#") > 0) return;
+    if (pageName(href) === here) a.classList.add("active");
   });
 
   /* ---- Inquiry submit: POST JSON to the Sydney handler ---- */

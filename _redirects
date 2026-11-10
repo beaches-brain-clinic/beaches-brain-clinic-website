@@ -1,0 +1,18 @@
+# Cloudflare Pages redirects. Old WordPress addresses -> new pages, so search
+# rankings, bookmarks and links from other sites keep working. 301 = permanent.
+# The first matching rule wins, so the specific ones come before the catch-alls.
+
+/index.php/about-us                /about             301
+/index.php/about-us/               /about             301
+/index.php/adult-assessment        /adult-assessment  301
+/index.php/adult-assessment/       /adult-assessment  301
+/index.php/child-assessment        /child-assessment  301
+/index.php/child-assessment/       /child-assessment  301
+/index.php/contact                 /#contact          301
+/index.php/contact/                /#contact          301
+/index.php/referral-contact        /referrals         301
+/index.php/referral-contact/       /referrals         301
+
+# Anything else from the old site's /index.php/ paths, or index.php itself.
+/index.php/*                       /                  301
+/index.php                         /                  301

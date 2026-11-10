@@ -18,7 +18,12 @@ Cloud Run, Sydney). **This site's forms POST to that backend** — see below.
 - **`assets/js/main.js`** — all behaviour (nav, scroll reveal, form submission, pre-warm).
 - **`assets/img/`** — `logo.png` (1200px source), `logo-email.png` (240px, used by the
   backend's emails), photos, favicons.
-- `_headers`, `robots.txt`, `sitemap.xml`, `site.webmanifest` — Pages/SEO config.
+- `_headers`, `_redirects`, `robots.txt`, `sitemap.xml`, `site.webmanifest` — Pages/SEO config.
+  `_redirects` maps the old WordPress `/index.php/...` addresses to the new pages.
+- **`scripts/build.sh`** — the Cloudflare Pages build: copies an **allow-list** of public
+  files into `dist/` so internal files (`CLAUDE.md`, `README.md`, …) are never published.
+  **Add new pages / top-level files to it**, or they won't deploy. Cloudflare Pages
+  settings: build command `sh scripts/build.sh`, output directory `dist`.
 - `_research/`, `_shots/`, `review/` are gitignored working artifacts (not published).
 
 ## Brand tokens (single source of truth — `:root` in `styles.css`)
@@ -52,6 +57,11 @@ Cloud Run, Sydney). **This site's forms POST to that backend** — see below.
 
 ## Conventions / gotchas
 
+- **Links have no `.html`, and are relative** (`about`, `./`, `./#contact`). Cloudflare
+  Pages serves `/about` and 308-redirects `/about.html` to it; relative links keep the
+  GitHub Pages staging copy (under a subfolder) working too. Canonicals and `sitemap.xml`
+  use the extensionless form. `404.html` is the exception: it uses root-absolute paths,
+  because it's served at whatever address was missing.
 - **GitHub Pages caches assets ~600s.** Bump the `?v=YYYYMMDD…` cache-buster on `<link>`/
   `<script>` asset URLs across **all** pages when you change CSS/JS, or stale assets ship
   (this once made the form say "not connected" after the endpoint was wired).
