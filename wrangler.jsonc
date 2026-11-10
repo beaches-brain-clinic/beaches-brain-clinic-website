@@ -1,0 +1,14 @@
+// Cloudflare Workers static-assets config. No Worker script: Cloudflare just serves
+// the built site. The build (`sh scripts/build.sh`) writes the public allow-list
+// into dist/; `npx wrangler deploy` uploads it. _headers and _redirects in dist/ apply.
+{
+  "name": "beaches-brain-clinic-website",
+  "compatibility_date": "2026-11-10",
+  "assets": {
+    "directory": "./dist",
+    // /about serves about.html; /about.html redirects to /about.
+    "html_handling": "auto-trailing-slash",
+    // Unknown paths get 404.html with a real 404 status.
+    "not_found_handling": "404-page"
+  }
+}

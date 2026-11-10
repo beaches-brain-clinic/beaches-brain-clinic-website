@@ -3,7 +3,7 @@
 Static marketing site for a two-person Sydney neuropsychology practice (Dr Natalie
 Phillips + her technical partner James, who owns the build). Hand-written HTML/CSS/JS —
 **no framework, no build step.** Replaces a WordPress site. Currently on **GitHub Pages
-staging**; a Cloudflare Pages + custom-domain cutover is planned for go-live.
+staging**; a Cloudflare (Workers static assets) + custom-domain cutover is planned for go-live.
 
 The private backend lives in a sibling repo, `beaches-brain-clinic-backend` (Python on
 Cloud Run, Sydney). **This site's forms POST to that backend** — see below.
@@ -20,10 +20,13 @@ Cloud Run, Sydney). **This site's forms POST to that backend** — see below.
   backend's emails), photos, favicons.
 - `_headers`, `_redirects`, `robots.txt`, `sitemap.xml`, `site.webmanifest` — Pages/SEO config.
   `_redirects` maps the old WordPress `/index.php/...` addresses to the new pages.
-- **`scripts/build.sh`** — the Cloudflare Pages build: copies an **allow-list** of public
+- **`scripts/build.sh`** — the Cloudflare build: copies an **allow-list** of public
   files into `dist/` so internal files (`CLAUDE.md`, `README.md`, …) are never published.
-  **Add new pages / top-level files to it**, or they won't deploy. Cloudflare Pages
-  settings: build command `sh scripts/build.sh`, output directory `dist`.
+  **Add new pages / top-level files to it**, or they won't deploy.
+- **`wrangler.jsonc`** — Cloudflare **Workers static assets** (Cloudflare's successor to
+  Pages; the dashboard now creates Workers). Serves `dist/`, extensionless HTML,
+  `404.html` for unknown paths. Workers Builds: build command `sh scripts/build.sh`,
+  deploy command `npx wrangler deploy`.
 - `_research/`, `_shots/`, `review/` are gitignored working artifacts (not published).
 
 ## Brand tokens (single source of truth — `:root` in `styles.css`)
@@ -58,7 +61,7 @@ Cloud Run, Sydney). **This site's forms POST to that backend** — see below.
 ## Conventions / gotchas
 
 - **Links have no `.html`, and are relative** (`about`, `./`, `./#contact`). Cloudflare
-  Pages serves `/about` and 308-redirects `/about.html` to it; relative links keep the
+  serves `/about` and redirects `/about.html` to it; relative links keep the
   GitHub Pages staging copy (under a subfolder) working too. Canonicals and `sitemap.xml`
   use the extensionless form. `404.html` is the exception: it uses root-absolute paths,
   because it's served at whatever address was missing.

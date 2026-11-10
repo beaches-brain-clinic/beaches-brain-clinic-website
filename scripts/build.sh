@@ -1,8 +1,8 @@
 #!/bin/sh
-# Cloudflare Pages build: copy ONLY the public site into dist/.
+# Cloudflare build: copy ONLY the public site into dist/.
 # An allow-list, so internal files (CLAUDE.md, README.md, editor configs, any new
 # notes) are never published. Add a path here when you add a page or top-level file.
-# Cloudflare Pages settings: build command `sh scripts/build.sh`, output dir `dist`.
+# Cloudflare Workers Builds: build command `sh scripts/build.sh`; wrangler.jsonc serves dist/.
 set -eu
 rm -rf dist
 mkdir -p dist
