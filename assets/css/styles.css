@@ -311,6 +311,14 @@ em.grad-text, .grad-text em { font-style: normal; }
 .form-status.ok { display: block; background: rgba(79,190,140,0.14); color: #1f7a4d; border: 1px solid rgba(79,190,140,0.4); }
 .form-status.err { display: block; background: rgba(214,69,69,0.1); color: #b23a3a; border: 1px solid rgba(214,69,69,0.35); }
 
+/* Callout — "please note" / redirect notice, sits beside or above a form */
+.callout { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: var(--paper-2); border: 1px solid var(--line); border-left: 3px solid var(--action); border-radius: var(--r-md); font-size: 0.92rem; line-height: 1.55; color: var(--ink-soft); }
+.callout p { margin: 0; }
+.callout svg { flex: none; width: 19px; height: 19px; color: var(--action); margin-top: 2px; }
+.callout strong { color: var(--ink); }
+.callout a { color: var(--action); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.callout a:hover { color: var(--action-2); }
+
 /* CTA band */
 .cta-band { text-align: center; }
 .cta-band .inner { background: var(--grad-ink); border-radius: var(--r-lg); padding: clamp(42px, 6vw, 74px) var(--gutter); position: relative; overflow: hidden; }
