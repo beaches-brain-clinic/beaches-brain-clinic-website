@@ -117,8 +117,75 @@
     fetch(INQUIRY_ENDPOINT.replace(/\/inquiry$/, "/health"), { mode: "no-cors" }).catch(function () {});
   }
 
+  /* Cloudflare Turnstile (bot check). The script loads only once someone starts a
+     form, not on every page view. "interaction-only" keeps the widget invisible
+     unless Cloudflare needs the visitor to tick a box. Cloudflare sees browser
+     signals only; the form content goes solely to the Sydney backend, which checks
+     the token with Cloudflare before storing anything. */
+  var TURNSTILE_SITEKEY = "0x4AAAAAAF8orcL1dVO-E1i_";
+  var turnstileState = "idle"; /* idle | loading | ready | failed */
+  var turnstileQueue = [];
+  function loadTurnstile(cb) {
+    if (turnstileState === "ready" || turnstileState === "failed") { cb(); return; }
+    turnstileQueue.push(cb);
+    if (turnstileState === "loading") return;
+    turnstileState = "loading";
+    window.bbcTurnstileReady = function () {
+      turnstileState = "ready";
+      turnstileQueue.splice(0).forEach(function (f) { f(); });
+    };
+    var s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=bbcTurnstileReady";
+    s.async = true;
+    s.onerror = function () { /* blocked/offline: submit without a token, backend decides */
+      turnstileState = "failed";
+      turnstileQueue.splice(0).forEach(function (f) { f(); });
+    };
+    document.head.appendChild(s);
+  }
+
   document.querySelectorAll("form.inquiry-form, form.referral-form").forEach(function (form) {
     var status = form.querySelector(".form-status");
+    var tsBox = form.querySelector(".cf-turnstile");
+    var tsWidget = null;
+    var tsError = false;
+    function startTurnstile() {
+      if (!tsBox || tsWidget !== null) return;
+      tsWidget = "pending";
+      loadTurnstile(function () {
+        if (turnstileState !== "ready") { tsWidget = null; return; }
+        tsWidget = window.turnstile.render(tsBox, {
+          sitekey: TURNSTILE_SITEKEY,
+          appearance: "interaction-only",
+          size: "flexible",
+          action: form.classList.contains("referral-form") ? "referral" : "contact",
+          callback: function () { tsError = false; },
+          "error-callback": function () { tsError = true; } /* stop waiting; Turnstile retries on its own */
+        });
+      });
+    }
+    /* Resolve with the token, waiting briefly if the check is still running;
+       give up after maxMs and send without one (never trap a real person). */
+    function getToken(maxMs) {
+      return new Promise(function (resolve) {
+        var waited = 0;
+        (function poll() {
+          var ready = typeof tsWidget === "string" && tsWidget !== "pending" && window.turnstile;
+          var tok = ready ? window.turnstile.getResponse(tsWidget) : "";
+          if (tok || tsError || waited >= maxMs || (tsWidget === null && turnstileState !== "loading")) {
+            resolve(tok || "");
+            return;
+          }
+          waited += 250;
+          setTimeout(poll, 250);
+        })();
+      });
+    }
+    function resetTurnstile() { /* tokens are single-use */
+      if (typeof tsWidget === "string" && tsWidget !== "pending" && window.turnstile) {
+        try { window.turnstile.reset(tsWidget); } catch (err) { /* ignore */ }
+      }
+    }
     var submitBtn = form.querySelector('[type="submit"]');
     var defaultLabel = submitBtn ? submitBtn.innerHTML : "";
 
@@ -141,6 +208,7 @@
     }
 
     form.addEventListener("focusin", prewarm, { once: true });
+    form.addEventListener("focusin", startTurnstile, { once: true });
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
@@ -151,16 +219,22 @@
       }
 
       var data = Object.fromEntries(new FormData(form).entries());
+      delete data["cf-turnstile-response"]; /* Turnstile's own hidden input; sent as turnstile_token */
       var payload = form.classList.contains("referral-form") ? referralPayload(data) : data;
 
       if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = "Sending…"; }
       if (status) status.className = "form-status";
 
-      fetch(INQUIRY_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
+      startTurnstile(); /* in case the form was submitted without focusing a field */
+      getToken(8000)
+        .then(function (token) {
+          payload.turnstile_token = token;
+          return fetch(INQUIRY_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+        })
         .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
         .then(function (res) {
           if (res.ok) {
@@ -169,6 +243,8 @@
             showStatus("ok", "Thank you — your enquiry has been received. We'll be in touch shortly.");
           } else if (res.body && res.body.error === "validation_failed") {
             showStatus("err", "Please check the highlighted fields and try again.");
+          } else if (res.body && res.body.error === "verification_failed") {
+            showStatus("err", "We couldn't confirm this was sent by a person. Please try again in a moment, or email us directly at contact@beachesbrainclinic.com.au.");
           } else {
             showStatus("err", "Something went wrong. Please email us directly at contact@beachesbrainclinic.com.au.");
           }
@@ -177,6 +253,7 @@
           showStatus("err", "Network error. Please email us directly at contact@beachesbrainclinic.com.au.");
         })
         .finally(function () {
+          resetTurnstile();
           if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = defaultLabel; }
         });
     });
