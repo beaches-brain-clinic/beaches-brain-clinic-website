@@ -2,8 +2,10 @@
 
 Static marketing site for a two-person Sydney neuropsychology practice (Dr Natalie
 Phillips + her technical partner James, who owns the build). Hand-written HTML/CSS/JS —
-**no framework, no build step.** Replaces a WordPress site. Currently on **GitHub Pages
-staging**; a Cloudflare (Workers static assets) + custom-domain cutover is planned for go-live.
+**no framework, no build step.** Replaces a WordPress site. **Live since 2026-11-11** at
+`https://beachesbrainclinic.com.au`, served by Cloudflare Workers static assets. DNS is on
+Cloudflare; the domain stays registered at GoDaddy (Cloudflare can't register `.com.au`).
+GitHub Pages staging has been switched off.
 
 The private backend lives in a sibling repo, `beaches-brain-clinic-backend` (Python on
 Cloud Run, Sydney). **This site's forms POST to that backend** — see below.
@@ -61,18 +63,24 @@ Cloud Run, Sydney). **This site's forms POST to that backend** — see below.
 ## Conventions / gotchas
 
 - **Links have no `.html`, and are relative** (`about`, `./`, `./#contact`). Cloudflare
-  serves `/about` and redirects `/about.html` to it; relative links keep the
-  GitHub Pages staging copy (under a subfolder) working too. Canonicals and `sitemap.xml`
+  serves `/about` and redirects `/about.html` to it; relative links also keep local
+  previews (and any subfolder copy) working. Canonicals and `sitemap.xml`
   use the extensionless form. `404.html` is the exception: it uses root-absolute paths,
   because it's served at whatever address was missing.
-- **GitHub Pages caches assets ~600s.** Bump the `?v=YYYYMMDD…` cache-buster on `<link>`/
+- **Assets are cached long-term** (`/assets/*` is `immutable` in `_headers`). Bump the `?v=YYYYMMDD…` cache-buster on `<link>`/
   `<script>` asset URLs across **all** pages when you change CSS/JS, or stale assets ship
   (this once made the form say "not connected" after the endpoint was wired).
 - **Mobile-only CSS changes must not alter desktop.** Past mobile fixes are scoped under
   `@media (max-width: …)`. The owner reviews desktop and mobile separately.
-- No DNS changes until the owner is ready to cut the domain over (the WordPress site is
-  still live on the real domain during staging).
-- One change = one branch + PR + merge; keep `main` == what's deployed to Pages.
+- **Forms only work on the real domain.** The backend's CORS allow-list and the Turnstile
+  widget's hostname are both `beachesbrainclinic.com.au`, so on a workers.dev preview or
+  localhost the form can't submit. Test form changes locally with Cloudflare's always-pass
+  test site key (`1x00000000000000000000AA`) and a stubbed `fetch`, then check live after merge.
+- **Turnstile** (bot check) loads only on first form focus; site key is in `main.js`, the
+  secret is in the backend's Secret Manager. See the backend's `inquiry/turnstile.py`.
+- DNS changes are made in **Cloudflare only** (DigitalOcean no longer serves the domain).
+- One change = one branch + PR + merge; merging to `main` auto-deploys to production
+  (Workers Builds), so keep `main` == what's live.
 
 For the overall system design and the privacy model, see
 `../beaches-brain-clinic-backend/CLAUDE.md` and `docs/ARCHITECTURE.md` in that repo.

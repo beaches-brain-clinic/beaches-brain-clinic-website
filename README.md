@@ -87,48 +87,18 @@ Common edits:
 
 ## 5. Hosting
 
-**Current state:** the site auto-deploys to **GitHub Pages** from `main` (test/staging URL —
-see the repo's Settings → Pages). This is the "stand it up and test end-to-end" step of the
-cutover; the custom domain goes to Cloudflare Pages (below) at go-live, and only then does
-the old droplet get decommissioned.
+**Live since 2026-11-11** at **https://beachesbrainclinic.com.au**.
 
-### The cheapest options
-
-This is a static site, so it can run on free hosting that's faster and far more reliable
-than the current Digital Ocean + WordPress setup (and removes the security/update burden).
-
-| Option | Cost | Notes |
-|--------|------|-------|
-| **Cloudflare Pages** ⭐ recommended | **Free** | Unlimited bandwidth, global CDN, free SSL, custom domain, drag-and-drop or Git deploy. The `_headers` file here works out of the box. |
-| **Netlify** | Free tier | Just as easy; 100 GB/mo bandwidth. Also reads `_headers`. |
-| **GitHub Pages** | Free | Great if you already use Git; no `_headers` support. |
-| Keep Digital Ocean droplet | ~US$4–6/mo | Works, but you pay monthly and maintain the server + WordPress updates. Not recommended for a static site. |
-
-**Bottom line:** with **Cloudflare Pages** your only ongoing cost is the **domain renewal**
-(~A$20/year). Everything else is $0.
-
-### Deploy to Cloudflare Pages (no command line needed)
-
-1. Create a free account at **https://dash.cloudflare.com** → **Workers & Pages** →
-   **Create** → **Pages** → **Upload assets**.
-2. Drag this whole folder in (or zip it first). Name the project `beaches-brain-clinic`.
-3. Click **Deploy**. You'll instantly get a live URL like
-   `beaches-brain-clinic.pages.dev` to check.
-4. **Custom domain:** in the project → **Custom domains** → add
-   `beachesbrainclinic.com.au` and `www.beachesbrainclinic.com.au`, then follow the DNS
-   instructions (easiest if you move the domain's nameservers to Cloudflare — they walk you
-   through it). SSL is automatic and free.
-
-> Prefer auto-deploys on every edit? Put this folder in a free GitHub repo and connect it in
-> the Pages "Import from Git" flow instead of uploading — then every saved change goes live
-> automatically.
-
-### Moving the domain off Digital Ocean
-
-Your domain `beachesbrainclinic.com.au` is registered somewhere (likely via DO or a
-registrar). You don't need to transfer the registration — just point the **DNS** at the new
-host (Cloudflare's setup wizard handles this). Once the new site is verified and live, you
-can safely shut down the Digital Ocean droplet to stop paying for it.
+- **Hosting:** Cloudflare **Workers static assets** (free plan), Worker
+  `beaches-brain-clinic-website`, configured by `wrangler.jsonc`.
+- **Deploys:** Workers Builds is connected to this repo. Every merge to `main` runs
+  `sh scripts/build.sh` (copies the allow-listed public files into `dist/`), then
+  `npx wrangler deploy`. It's live within about a minute.
+- **DNS:** on Cloudflare (nameservers `bradley` / `elly.ns.cloudflare.com`). The domain is still
+  **registered at GoDaddy**; renew it there (Cloudflare can't register `.com.au`).
+- **`www`:** a proxied record plus the "Redirect from WWW to root" rule (301 to the bare domain).
+  **Always Use HTTPS** is on.
+- **Old WordPress addresses** are 301-redirected by `_redirects`.
 
 ---
 
