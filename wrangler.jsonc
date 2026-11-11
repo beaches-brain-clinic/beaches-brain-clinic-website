@@ -10,5 +10,8 @@
     "html_handling": "auto-trailing-slash",
     // Unknown paths get 404.html with a real 404 status.
     "not_found_handling": "404-page"
-  }
+  },
+  // Branch/PR builds run `npx wrangler preview`, which requires this block (it can
+  // be empty; assets + compatibility settings above apply to previews too).
+  "previews": {}
 }
